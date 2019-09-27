@@ -1,0 +1,19 @@
+clear;
+
+%Importing image
+img = imread('Iris_virginica.jpg');
+imshow(img)
+r = img(:,:,1);
+g = img(:,:,2);
+b = img(:,:,3);
+
+histogram(r,'BinMethod','integers','FaceColor','r','EdgeAlpha',0,'FaceAlpha',1)
+hold on
+histogram(g,'BinMethod','integers','FaceColor','g','EdgeAlpha',0,'FaceAlpha',0.7)
+histogram(b,'BinMethod','integers','FaceColor','b','EdgeAlpha',0,'FaceAlpha',0.7)
+xlabel('RGB value')
+ylabel('Frequency')
+title('Color histogram in RGB color space')
+xlim([0 257])
+
+
