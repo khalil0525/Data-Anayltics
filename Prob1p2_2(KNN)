@@ -1,0 +1,9 @@
+function [] = Prob1p2_2
+load irisdataset.txt 
+Irises=irisdataset; 
+Dim=size(Irises);
+load fisheriris
+x = Irises(:,3:4);
+gscatter(x(:,1),x(:,2),species)
+legend('Location','best')
+end
