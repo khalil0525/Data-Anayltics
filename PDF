@@ -1,0 +1,5 @@
+img = imread('Iris_virginica.jpg');
+imhist(img);
+%Iris_versicolor_3.jpg
+%Iris_virginica.jpg
+%'Iris_setosa.jpg'
