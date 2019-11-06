@@ -1,0 +1,247 @@
+import java.io.*; 
+import java.util.*; 
+import java.util.LinkedList; 
+  
+class Graph
+{ 
+	int time = 0; 
+	static final int NIL = -1; 
+    private int numOfVertices;   // No. of vertices 
+    private LinkedList<Integer> adj[]; //Adjacency List 
+  
+    Graph(int vertices) //Constructor for the graph class
+    { 
+        numOfVertices = vertices; 
+        adj = new LinkedList[vertices]; 
+        for (int i=0; i < vertices; i++) 
+            adj[i] = new LinkedList(); 
+    } 
+    
+    void addDirectedEdge(int v, int w) {  adj[v].add(w); } //Method to add a directed edge.
+    void addUndirectedEdge(int v, int w) 
+    { 
+        adj[v].add(w);  //Note that the graph is undirected. 
+        adj[w].add(v); 
+    } 
+  
+    void DFSUtil(int v,Boolean visited[]) 
+    { 
+
+        visited[v] = true; 
+  
+        int n; 
+
+        Iterator<Integer> i = adj[v].iterator(); 
+        while (i.hasNext()) 
+        { 
+            n = i.next(); 
+            if (!visited[n]) 
+                DFSUtil(n,visited); 
+        } 
+    } 
+  
+    Graph getTranspose() 
+    { 
+        Graph g = new Graph(numOfVertices); 
+        for (int v = 0; v < numOfVertices; v++) 
+        { 
+        	
+            Iterator<Integer> i = adj[v].listIterator(); 
+            while (i.hasNext()) 
+                g.adj[i.next()].add(v); 
+        } 
+        return g; 
+    } 
+  
+    Boolean isSC() 
+    { 
+
+        Boolean visited[] = new Boolean[numOfVertices]; 
+        for (int i = 0; i < numOfVertices; i++) 
+            visited[i] = false; 
+  
+        DFSUtil(0, visited); 
+  
+        for (int i = 0; i < numOfVertices; i++) 
+            if (visited[i] == false) 
+                return false; 
+        
+        Graph gr = getTranspose(); 
+  
+        for (int i = 0; i < numOfVertices; i++) 
+            visited[i] = false; 
+  
+        gr.DFSUtil(0, visited); 
+  
+        for (int i = 0; i < numOfVertices; i++) 
+            if (visited[i] == false) 
+                return false; 
+  
+        return true; 
+    } 
+    boolean isBCUtil(int u, boolean visited[], int disc[],int low[], 
+		            int parent[]) 
+		{ 
+    	
+		int children = 0; 
+		visited[u] = true; 
+		disc[u] = low[u] = ++time; 
+		
+		Iterator<Integer> i = adj[u].iterator(); 
+		while (i.hasNext()) 
+		{ 
+		   int v = i.next();  
+		   if (!visited[v]) 
+		   { 
+		       children++; 
+		       parent[v] = u; 
+		
+		       if (isBCUtil(v, visited, disc, low, parent)) 
+		           return true; 
+		       
+		       low[u]  = Math.min(low[u], low[v]); 
+		
+
+		       if (parent[u] == NIL && children > 1) 
+		           return true; 
+		
+		       if (parent[u] != NIL && low[v] >= disc[u]) 
+		           return true; 
+		   } 
+		
+		   else if (v != parent[u]) 
+		       low[u]  = Math.min(low[u], disc[v]); 
+		} 
+		return false; 
+		} 
+
+		boolean isBC() 
+		{ 
+			
+		boolean visited[] = new boolean[numOfVertices]; 
+		int disc[] = new int[numOfVertices]; 
+		int low[] = new int[numOfVertices]; 
+		int parent[] = new int[numOfVertices]; 
+		
+		for (int i = 0; i < numOfVertices; i++) 
+		{ 
+		   parent[i] = NIL; 
+		   visited[i] = false; 
+		} 
+		
+		if (isBCUtil(0, visited, disc, low, parent) == true) 
+		   return false; 
+
+		for (int i = 0; i < numOfVertices; i++) 
+		   if (visited[i] == false) 
+		       return false; 
+		
+		return true; 
+		}
+		
+	    static void printGraph(Graph graph, LinkedList<FacebookUser> p) 
+	    {        
+	        for(int v = 0; v < graph.numOfVertices; v++) 
+	        { 
+	            System.out.println("Adjacency list of UID "+ v); 
+	            System.out.printf("head {%s}", p.get(v).getName()); 
+	            for(Integer pCrawl: graph.adj[v]){ 
+	                System.out.print(" -> " + p.get(pCrawl).getName()); 
+	            } 
+	            System.out.println("\n"); 
+	        } 
+	    }
+	    
+
+    public static void main(String args[]) 
+    { 
+        // Create graphs given in the above diagrams 
+    	LinkedList<Graph> graph = new LinkedList<Graph>();
+    	LinkedList<FacebookUser> people = new LinkedList<FacebookUser>();
+    	
+    	people.add(new FacebookUser(0, "Bob", 25));
+    	people.add(new FacebookUser(1, "Tosh", 55));
+    	people.add(new FacebookUser(2, "Paul", 21));
+    	people.add(new FacebookUser(3, "Rob", 34));
+    	people.add(new FacebookUser(4, "Barb", 65));
+    	
+
+        graph.add(new Graph(5)); 
+        graph.get(0).addDirectedEdge(0, 1); 
+        graph.get(0).addDirectedEdge(1, 2); 
+        graph.get(0).addDirectedEdge(2, 3); 
+        graph.get(0).addDirectedEdge(3, 0); 
+        graph.get(0).addDirectedEdge(2, 4); 
+        graph.get(0).addDirectedEdge(4, 2); 
+        
+        graph.add(new Graph(4)); 
+        graph.get(1).addDirectedEdge(0, 1); 
+        graph.get(1).addDirectedEdge(1, 2); 
+        graph.get(1).addDirectedEdge(2, 3); 
+        
+        graph.add(new Graph(2)); 
+        graph.get(2).addUndirectedEdge(0, 1);
+        
+        graph.add(new Graph(5)); 
+        graph.get(3).addUndirectedEdge(1, 0); 
+        graph.get(3).addUndirectedEdge(0, 2); 
+        graph.get(3).addUndirectedEdge(2, 1); 
+        graph.get(3).addUndirectedEdge(0, 3); 
+        graph.get(3).addUndirectedEdge(3, 4); 
+        graph.get(3).addUndirectedEdge(2, 4);
+        
+        graph.add(new Graph(3)); 
+        graph.get(4).addUndirectedEdge(0, 1); 
+        graph.get(4).addUndirectedEdge(1, 2);
+        
+        graph.add(new Graph(5)); 
+        graph.get(5).addUndirectedEdge(1, 0); 
+        graph.get(5).addUndirectedEdge(0, 2); 
+        graph.get(5).addUndirectedEdge(2, 1); 
+        graph.get(5).addUndirectedEdge(0, 3); 
+        graph.get(5).addUndirectedEdge(3, 4);
+        
+        graph.add(new Graph(3)); 
+        graph.get(6).addUndirectedEdge(0, 1); 
+        graph.get(6).addUndirectedEdge(1, 2); 
+        graph.get(6).addUndirectedEdge(2, 0); 
+        
+        int ct = 1;
+        for(Graph g:graph){
+        	
+        	System.out.println("-------------------------------- Graph: " + (ct++) + " -------------------------------- \n");
+        	printGraph(g, people);
+        	if(g.isSC())
+                System.out.println("Directed, strongly connected."); 
+            else
+                System.out.println("No, weakly connected. If we replace edges with undirected edges the graph will be connected.");
+        	
+            if (g.isBC()) 
+                System.out.println("Yes, is biconnected"); 
+            else
+                System.out.println("No, is not bioconnected"); 
+      
+        }
+        
+      
+    } 
+    
+    } 
+class FacebookUser{
+	int User_ID;
+	String name;
+	int age;
+	
+	FacebookUser(int UID, String name, int age){
+		this.User_ID = UID;
+		this.name = name;
+		this.age = age;
+		
+	}
+	public int getID(){
+		return User_ID;
+	}
+	public String getName(){
+		return name;
+	}
+}
